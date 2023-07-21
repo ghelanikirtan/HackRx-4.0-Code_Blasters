@@ -170,11 +170,10 @@ def ui_tester():
     
 
     final_ui_rating = prediction(img_preprocessed_data)
+    final_ui_rating_list = final_ui_rating.toList()
 
        
-    return json.dumps({
-        "Rating" : final_ui_rating
-    })
+    return jsonify({"Rating": final_ui_rating_list})
     
 
 

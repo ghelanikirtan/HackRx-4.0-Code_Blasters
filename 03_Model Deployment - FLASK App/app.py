@@ -22,7 +22,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 
 from flask import Flask, render_template, request, redirect, url_for
 import json
-import ngrok
+# import ngrok
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -102,7 +102,6 @@ def prediction(img):
     return predicted
 
 
-
 def fetch_test(url):
     opt = webdriver.ChromeOptions()
 
@@ -113,20 +112,30 @@ def fetch_test(url):
     driver.get(url)
 
     # Take screenshot and get the binary data
-    screenshot = driver.get_screenshot_as_png()
-
+    # screenshot = driver.get_screenshot_as_png()
+    screenShot = driver.save_screenshot("tempImage.png")
     # Close the driver
     driver.quit()
 
+    # img_np = np.frombuffer(screenshot, np.uint8)
+    
+    
     # Use BytesIO to create a file-like object in memory
+    # img_bytes = screenshot.to_image
     # screenshot_stream = io.BytesIO(screenshot)
+    # print(np.frombuffer(screenshot_stream, dtype=)
+    # print(np.frombuffer(screenshot_stream, dtype=np.float32))
 
     # Open the stream as an image with PIL
     # image = Image.open(screenshot_stream)
-    img = cv2.imread(screenshot)
+
+    # img = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
+    img = cv2.imread("tempImage.png")
     img = cv2.resize(img, (IMG_WIDTH, IMG_HEIGHT))
     img = preprocess_data(img)
-
+    # print(img)
+    # plt.imshow(img)
+    
     # Convert image to NumPy array
     # image_np = np.array(image)
 
@@ -135,6 +144,8 @@ def fetch_test(url):
     # return image_np
 
 
+def convert_ndarray_to_list(ndarray):
+    return ndarray.tolist()
 
 ############# Flask Application #############  
 
@@ -162,26 +173,24 @@ def testing():
 @app.route('/test-it-up', methods=['POST'])
 def ui_tester():
     byte_encode = request.get_data()
-    print(byte_encode)
+    # print(byte_encode)
     url = byte_encode.decode('utf-8')
+    url = url[1:-1]
     print(url)
     img_preprocessed_data = fetch_test(url)
     # print(list(data.shape))
     
-
     final_ui_rating = prediction(img_preprocessed_data)
-
+    # Convert the NumPy ndarray to a list
+    final_ui_rating_list = convert_ndarray_to_list(final_ui_rating)
+    # print(final_ui_rating[0])
        
-    return json.dumps({
-        "Rating" : final_ui_rating
-    })
-    
-
-
-if __name__ == '__main__':
+    return {"Rating": final_ui_rating_list}
     # ngrok.connect(9000, authtoken_from_env=True)
     # print(tunnel.url())
-    app.run()
+
+if __name__ == "__main__":
+    app.run(debug=True)
 
 
 
