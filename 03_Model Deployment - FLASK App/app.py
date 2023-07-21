@@ -102,11 +102,16 @@ def prediction(img):
     return predicted
 
 
-def fetch_test(url):
+def fetch_test(url,view=True):
     opt = webdriver.ChromeOptions()
 
     # Initialize Selenium Driver
     driver = webdriver.Chrome(options=opt)
+
+    if view:
+        driver.set_window_size(390,844)
+    else:
+        driver.set_window_size(1920,1080)
 
     # Open the URL
     driver.get(url)
@@ -176,6 +181,7 @@ def ui_tester():
     # print(byte_encode)
     url = byte_encode.decode('utf-8')
     url = url[1:-1]
+    view = url[:-1]
     print(url)
     img_preprocessed_data = fetch_test(url)
     # print(list(data.shape))
