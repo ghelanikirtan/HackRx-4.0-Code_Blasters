@@ -94,11 +94,13 @@ def preprocess_data(img_data):
     img_data /= 255.0
     return img_data
 
-def prediction(img):
+def prediction(img, mobile=True):
     img = np.expand_dims(img, axis=0)
     # conv_output = model_mobile(img, training=False)
-    predicted = model_mobile.predict(img)
-
+    if mobile:
+        predicted = model_mobile.predict(img)
+    else:
+        predicted = model_desktop.predict(img)
     return predicted
 
 
@@ -117,12 +119,12 @@ def fetch_test(url,view=True):
     driver.get(url)
 
     # Take screenshot and get the binary data
-    # screenshot = driver.get_screenshot_as_png()
-    screenShot = driver.save_screenshot("tempImage.png")
+    screenshot = driver.get_screenshot_as_png()
+    # screenShot = driver.save_screenshot("tempImage.png")
     # Close the driver
     driver.quit()
 
-    # img_np = np.frombuffer(screenshot, np.uint8)
+    img_np = np.frombuffer(screenshot, np.uint8)
     
     
     # Use BytesIO to create a file-like object in memory
@@ -134,8 +136,9 @@ def fetch_test(url,view=True):
     # Open the stream as an image with PIL
     # image = Image.open(screenshot_stream)
 
-    # img = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
-    img = cv2.imread("tempImage.png")
+    img = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
+    img = img[:, :-21]
+    # img = cv2.imread("tempImage.png")
     img = cv2.resize(img, (IMG_WIDTH, IMG_HEIGHT))
     img = preprocess_data(img)
     # print(img)
@@ -178,10 +181,11 @@ def testing():
 @app.route('/test-it-up', methods=['POST'])
 def ui_tester():
     byte_encode = request.get_data()
+    print(byte_encode)
     # print(byte_encode)
     url = byte_encode.decode('utf-8')
-    url = url[1:-1]
-    view = url[:-1]
+    url = url[1:-2]
+    # view = url[:-1]
     print(url)
     img_preprocessed_data = fetch_test(url)
     # print(list(data.shape))
