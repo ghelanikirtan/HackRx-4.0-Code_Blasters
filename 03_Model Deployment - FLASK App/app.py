@@ -76,6 +76,7 @@ model_desktop.compile(optimizer=Adam(learning_rate=0.001), loss=MeanSquaredError
 ######### Loading trained weights #############
 
 model_mobile.load_weights("best_weights_MOBILE.h5")
+# model_mobile.load_weights("minor_deviation_detection_MOBILE.h5")
 model_desktop.load_weights("best_weights_DESKTOP.h5")
 
 
@@ -184,7 +185,7 @@ def ui_tester():
     print(byte_encode)
     # print(byte_encode)
     url = byte_encode.decode('utf-8')
-    url = url[1:-2]
+    url = url[1:-1]
     # view = url[:-1]
     print(url)
     img_preprocessed_data = fetch_test(url)
